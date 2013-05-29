@@ -1,0 +1,15 @@
+Operates on text file representations of hit histograms, summing "from the right"
+to create a miss histogram.  Both input and output are "memory-size value" pairs
+on a per-line, space-delimeted basis.  Each number is a text decimal notation.
+All input and output are on stdin/stdout.
+
+To compile:
+
+  $ gcc -O4 -o htom htom.c
+
+To run:
+
+  $ ./htom 123456 < foo.hits > foo.misses
+
+Note that the command line argument is the footprint, in decimal.
+
