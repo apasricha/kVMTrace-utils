@@ -22,6 +22,7 @@ main (int argc, char** argv)
       x[memsize] = hits;
     } else {
       fprintf(stderr, "ERROR: index = %ld, footprint = %ld\n", memsize, footprint);
+      exit(1);
     }
   }
 
