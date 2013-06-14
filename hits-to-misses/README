@@ -1,15 +1,12 @@
-Operates on text file representations of hit histograms, summing "from the right"
-to create a miss histogram.  Both input and output are "memory-size value" pairs
-on a per-line, space-delimeted basis.  Each number is a text decimal notation.
-All input and output are on stdin/stdout.
-
-To compile:
-
-  $ gcc -O4 -o htom htom.c
+Extracts a hit histograms from our LRU database (based on the name of
+a workload), then summing "from the right" to create a miss histogram.
+The output is a sequence of "memory-size value" pairs on a per-line,
+space-delimeted basis.  Each number is a text decimal notation.  All
+output is to a file whose name is taken from the workload name and the
+suffixed with '.misses'.
 
 To run:
 
-  $ ./htom 123456 < foo.hits > foo.misses
-
-Note that the command line argument is the footprint, in decimal.
-
+  $ ./hits-to-misses.sh eclipse
+  $ less eclipse.misses
+  [...]
