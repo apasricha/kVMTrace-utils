@@ -12,4 +12,6 @@ endif
 set workload = ${argv[1]}
 
 # Perform the extraction/summation.
-psql --no-align --tuples-only --record-separator " " --command "select qpos, refs from lru where workload = '${workload}';"
+psql --quiet --no-align --tuples-only --field-separator " " --command "select qpos, refs from lru where workload = '${workload}';" kVMTrace \
+    | ./hits-to-misses.py \
+    > ${workload}.misses
