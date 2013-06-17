@@ -1,4 +1,3 @@
-#! /usr/bin/env python3
 
 import sys
 
@@ -10,8 +9,8 @@ def main (argv):
     
     footprint = footprint_finder(argv[1])
     read_file (argv[2], argv[3], argv[4])
-    make_plot(footprint)
-    gnuplot_scripter()
+    filelist = make_plot(footprint)
+    gnuplot_scripter(filelist)
     
 def footprint_finder(fname): #returns footprint
     with open(fname) as f:
@@ -42,9 +41,11 @@ def read_file(f1, f2, f3):	# format of the input files: two lines. first....****
         hdd_costcap = float(f.readline())    
         
 def make_plot(footprint):
+    filelist = []
     x = 1
     while x <footprint:
         name = "RAM:" + str(x)
+        filelist.append('"' + name + '"')
         with open(name, 'w') as f:
             y = x
             while y < footprint:
@@ -56,13 +57,16 @@ def make_plot(footprint):
                 
         x = x +int(footprint/ 6)
         print(x)
-
-def gnuplot_scripter():
+        
+        return filelist
+    
+def gnuplot_scripter(filelist):
     print('gnuplot\n')
     print('set style data linespoints\n')
     print('set logscale y\n')
     RAMlist = ",".join(filelist)
     print ('plot ' + RAMlist)
-    
+   
+
 if __name__ == "__main__":
 	main(sys.argv)
