@@ -56,5 +56,12 @@ def make_plot(footprint):
         x = x +int(footprint/ 6)
         print(x)
 
+def gnuplot_scripter():
+    print('gnuplot\n')
+    print('set style data linespoints\n')
+    print('set logscale y\n')
+    RAMlist = ",".join(filelist)
+    print ('plot ' + RAMlist)
+    
 if __name__ == "__main__":
 	main(sys.argv)
