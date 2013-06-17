@@ -11,6 +11,7 @@ def main (argv):
     footprint = footprint_finder(argv[1])
     read_file (argv[2], argv[3], argv[4])
     make_plot(footprint)
+    gnuplot_scripter()
     
 def footprint_finder(fname): #returns footprint
     with open(fname) as f:
