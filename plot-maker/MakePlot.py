@@ -1,23 +1,25 @@
+#! /usr/bin/env python3
+
 import sys
 
-def main():
+def main (argv):
 
-    if len(sys.argv) != 3:
+    if len(argv) != 5: 
         sys.stderr.write("Usage: MakePlot.py <traceName> <File of RamInfo> < File of SSDInfo> <File of HDDInfo> ")
         sys.exit()
     
-    footprint = footprint_finder(sys.argv[1])
-    read_file (sys.argv[2], sys.argv[3], sys.argv[4])
+    footprint = footprint_finder(argv[1])
+    read_file (argv[2], argv[3], argv[4])
     make_plot(footprint)
     
 def footprint_finder(fname): #returns footprint
     with open(fname) as f:
         global misses
-        misses = {0}
+        misses = [0]
         i = 1
         for line in f:
             i = i + 1
-            misses.append(line.split()[1])
+            misses.append(float(line.split()[1]))
             
     return i            
 
@@ -39,14 +41,20 @@ def read_file(f1, f2, f3):	# format of the input files: two lines. first....****
         hdd_costcap = float(f.readline())    
         
 def make_plot(footprint):
-    for x in range(1, footprint):
-        name = "RAM:" + x
+    x = 1
+    while x <footprint:
+        name = "RAM:" + str(x)
         with open(name, 'w') as f:
-            for y in range (x, footprint):
-                delay = ssd_accesstime*misses[x] + hdd_accesstime*misses[y] #is there a conversion i'm missing here?
+            y = x
+            while y < footprint:
+                delay = ssd_accesstime*misses[x] + hdd_accesstime*misses[y]
                 cost = ram_costcap*x + ssd_costcap*y + hdd_costcap*footprint
-                filestring = cost + " " + delay + '\n' 
+                filestring = str(cost) + " " + str(delay) + '\n' 
                 f.write(filestring) 
-                y = y + 50 #preferred increment?
+                y = y +int(footprint/50) #preferred increment?
                 
-        x = x + 50
+        x = x +int(footprint/ 6)
+        print(x)
+
+if __name__ == "__main__":
+	main(sys.argv)
