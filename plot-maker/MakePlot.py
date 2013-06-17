@@ -1,4 +1,3 @@
-
 import sys
 
 def main():
@@ -20,7 +19,7 @@ def footprint_finder(fname): #returns footprint
             i = i + 1
             misses.append(line.split()[1])
             
-    return i*4/1024 #this calculation converts from KB to            
+    return i            
 
 def read_file(f1, f2, f3):	# format of the input files: two lines. first....******   
     with open(f1) as f:
