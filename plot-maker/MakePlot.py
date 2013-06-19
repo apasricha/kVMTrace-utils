@@ -1,4 +1,4 @@
-
+#! /usr/bin/env python3
 import sys
 
 def main (argv):
@@ -21,7 +21,7 @@ def footprint_finder(fname): #returns footprint
             i = i + 1
             misses.append(float(line.split()[1]))
             
-    return i            
+    return i*1000            
 
 def read_file(f1, f2, f3):	# format of the input files: two lines. first....******   
     with open(f1) as f:
@@ -41,31 +41,55 @@ def read_file(f1, f2, f3):	# format of the input files: two lines. first....****
         hdd_costcap = float(f.readline())    
         
 def make_plot(footprint):
-    filelist = []
-    x = 1
-    while x <footprint:
-        name = "RAM:" + str(x)
-        filelist.append('"' + name + '"')
-        with open(name, 'w') as f:
-            y = x
-            while y < footprint:
-                delay = ssd_accesstime*misses[x] + hdd_accesstime*misses[y]
-                cost = ram_costcap*x + ssd_costcap*y + hdd_costcap*footprint
-                filestring = str(cost) + " " + str(delay) + '\n' 
-                f.write(filestring) 
-                y = y +int(footprint/50) #preferred increment?
-                
-        x = x +int(footprint/ 6)
-        print(x)
+    
+    filelist = ['"RAMHDD"', '"RAMSSD"']
+    x = 10000
+
+    with open ("RAMHDD", 'w') as file1, open ("RAMSSD", 'w') as file2:
         
-        return filelist
+        while x <footprint:
+            name = "RAM:" + str(x)
+            filelist.append('"' + name + '"')
+            RAMdelay = hdd_accesstime*misses[int(x/1000)]
+            RAMcost = ram_costcap*x + hdd_costcap*footprint
+            RAMstring =  str(RAMcost) + " " + str(RAMdelay) + '\n' 
+            file1.write(RAMstring)
+
+            SSDdelay = ssd_accesstime*misses[int(x/1000)]
+            SSDcost = ram_costcap*x + ssd_costcap*footprint
+            SSDstring =  str(SSDcost) + " " + str(SSDdelay) + '\n' 
+            file2.write(SSDstring)
+
+            
+
+            with open(name, 'w') as f:
+                y = x
+                while y < footprint:
+                    delay = ssd_accesstime*misses[int(x /1000)] + hdd_accesstime*misses[int(y/1000)]
+                    cost = ram_costcap*x + ssd_costcap*y + hdd_costcap*footprint
+                    filestring = str(cost) + " " + str(delay) + '\n' 
+                    f.write(filestring) 
+                    y = y +int(footprint/500) 
+
+
+            x = x +int(footprint/ 20)
+    
+    return filelist
+
     
 def gnuplot_scripter(filelist):
-    print('gnuplot\n')
+    print('#! /usr/bin/env gnuplot\n')
     print('set style data linespoints\n')
+   # print('set style data dots\n')
     print('set logscale y\n')
+    print('set nokey')
+   # print('set terminal postscript enhanced color')
+    print ("set output '| ps2pdf - output.pdf'")
+    
     RAMlist = ",".join(filelist)
-    print ('plot ' + RAMlist)
+    print ('plot ' + RAMlist +'\n')
+    print ("pause -1\n")
+
    
 
 if __name__ == "__main__":
