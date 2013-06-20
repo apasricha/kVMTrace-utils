@@ -5,13 +5,13 @@ import sys
 def main (argv): #Run hits file through hits-to-misses utility to generate misses file. 
 
     if len(argv) != 5: 
-        sys.stderr.write("Usage: MakePlot.py <Misses File> <File of RamInfo> < File of SSDInfo> <File of HDDInfo> ")
+        sys.stderr.write("Usage: MakePlot.py <Misses File> <File of RamInfo> < File of SSDInfo> <File of HDDInfo>\n")
         sys.exit()
     
     footprint = footprint_finder(argv[1])
     read_file (argv[2], argv[3], argv[4])
     filelist = make_plot(footprint)
-    gnuplot_scripter(filelist)
+    gnuplot_scripter(filelist, argv[1])
     
 def footprint_finder(fname): #returns footprint and creates misses list that will be accessed by make_plot()
     with open(fname) as f:
@@ -82,18 +82,18 @@ def make_plot(footprint):
     return filelist
 
     
-def gnuplot_scripter(filelist):
+def gnuplot_scripter(filelist, misses_path):
     print('#! /usr/bin/env gnuplot\n')
     print('set style data linespoints\n')
    # print('set style data dots\n')
     print('set logscale y\n')
    # print('set nokey')
-   # print('set terminal postscript enhanced color')
-    print ("set output '| ps2pdf - output.pdf'")
+    print('set terminal postscript enhanced color')
+    print ("set output '| ps2pdf - " + misses_path + ".pdf'")
     
     RAMlist = ",".join(filelist)
     print ('plot ' + RAMlist +'\n')
-    print ("pause -1\n")
+   # print ("pause -1\n")
 
    
 
