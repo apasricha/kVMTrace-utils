@@ -50,8 +50,8 @@ def make_plots(footprint): #produces data for three kinds of plots: cost-delay, 
     filelist = [costdelay_filelist, costperformance_filelist, costppd_filelist] 
     
     with open ("costdelayRAM:NoSSD", 'w') as cdNoSSD, open ("costdelayRAM:NoHDD", 'w') as cdNoHDD, open ("costperfRAM:NoSSD", 'w') as cpNoSSD, open ("costperfRAM:NoHDD", 'w') as cpNoHDD, open ("costppdRAM:NoSSD", 'w') as cppdNoSSD, open ("costppdRAM:NoHDD", 'w') as cppdNoHDD:
-        
-        while x <footprint:
+        incrementx = int((footprint-x)/20)
+        while x <footprint and incrementx != 0:
             cdname = "costdelayRAM:" + str(x)
             cpname = "costperfRAM:" + str(x)
             cppdname = "costppdRAM:" + str(x)      
@@ -70,7 +70,7 @@ def make_plots(footprint): #produces data for three kinds of plots: cost-delay, 
             NoSSD_cpstring = str(NoSSDcost) + " " + str(1/NoSSDdelay) + '\n'
             cpNoSSD.write(NoSSD_cpstring)
             
-            NoSSD_cppdstring = str(NoSSDcost) + " " + str(1/NoSSDdelay*NoSSDcost) + '\n'
+            NoSSD_cppdstring = str(NoSSDcost) + " " + str(1/(NoSSDdelay*NoSSDcost)) + '\n'
             cppdNoSSD.write(NoSSD_cdstring)
             
             #No HDD case: 
@@ -83,12 +83,13 @@ def make_plots(footprint): #produces data for three kinds of plots: cost-delay, 
             NoHDD_cpstring = str(NoHDDcost) + " " + str(1/NoHDDdelay) + '\n'
             cpNoHDD.write(NoHDD_cpstring)
             
-            NoHDD_cppdstring = str(NoHDDcost) + " " + str(1/NoHDDdelay*NoHDDcost) + '\n'
+            NoHDD_cppdstring = str(NoHDDcost) + " " + str(1/(NoHDDdelay*NoHDDcost)) + '\n'
             cppdNoHDD.write(NoHDD_cdstring)
            
             with open(cdname, 'w') as cdfile,open (cpname, 'w') as cpfile, open (cppdname, 'w') as cppdfile:
                 y = x #SSD cannot sensibly be smaller than RAM                
-                while y < footprint:
+                incrementy = int((footprint-y)/20)
+                while y < footprint and incrementy != 0:
                     delay = ssd_accesstime*misses[int(x )] + hdd_accesstime*misses[int(y)]
                     cost = ram_costcap*x + ssd_costcap*y + hdd_costcap*footprint
                     
@@ -98,11 +99,13 @@ def make_plots(footprint): #produces data for three kinds of plots: cost-delay, 
                     cpfile.write(cpstring)
                     cppdstring = str(cost) + " " + str(1/(delay*cost))+ '\n'
                     cppdfile.write(cppdstring)
+
+                   # print("y =" + str(y))
+                    y = y +incrementy #change 500 to the number of points you wish to see per curve
                     
-                    y = y +int(footprint/500) #change 500 to the number of points you wish to see per curve
-
-
-            x = x +int(footprint/ 20) #change 20 to the number of curves you wish to see
+           # print(x)
+           # print("footprint = " + str(footprint))
+            x = x + incrementx #change 20 to the number of curves you wish to see
     
     return filelist
   
