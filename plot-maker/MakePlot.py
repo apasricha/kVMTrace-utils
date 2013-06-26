@@ -115,23 +115,29 @@ def gnuplot_scripter(filelist, misses_path):#creates gnuplot script to produce p
     print('set nokey')
     
     #Creates the cost-delay pdf   
+    print('set title "costdelay' + misses_path +'"' )
     print('set xlabel "Cost (dollars)"')
     print('set ylabel "Delay (nanoseconds)"')
+    # print('set yrange [1:]')
     print ("set output '| ps2pdf - costdelay" + misses_path + ".pdf'\n")
     cdlist = ",".join(filelist[0])
     print ('plot ' + cdlist)
 
     #Creates the cost-performance pdf
+    print('set title "costperformance' + misses_path + '"' )
     print('set xlabel "Cost (dollars)"')
     print('set ylabel "Performance (gigahertz)"')
     print ("set output '| ps2pdf - costperf" + misses_path + ".pdf'\n") 
+    #print('set yrange [1:]')
     cplist = ",".join(filelist[1])
     print ('plot ' + cplist)
     
     #Creates the cost-performance per delay pdf    
+    print('set title "costppd' + misses_path + '"' )
     print('set xlabel "Cost (dollars)"')
     print('set ylabel "Performance per dollar (giaghertz/dollar)"')
     print ("set output '| ps2pdf - costppd" + misses_path + ".pdf'\n")
+    # print('set yrange [1:]')
     cppdlist = ",".join(filelist[2])
     print ('plot ' + cppdlist)
 

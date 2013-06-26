@@ -8,8 +8,6 @@ foreach x ($l)
 	./MakePlot.py ${x}.misses SampleRAM SampleSSD SampleHDD >& ${x}.gnuplot
 	chmod u+x ${x}.gnuplot
 	./${x}.gnuplot
-	
-	printf "kindadone.\n"
 
 	mv costdelay${x}.misses.pdf ${HOME}/kVMTrace-plots/costdelay_${x}.pdf
 	mv costperf${x}.misses.pdf ${HOME}/kVMTrace-plots/cost_perf_${x}.pdf
