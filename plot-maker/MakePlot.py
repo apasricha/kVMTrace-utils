@@ -2,9 +2,9 @@
 
 import sys
 
-def main (argv): #Run hits file through hits-to-misses utility to generate misses file. 
+def main (argv): #Run hits file through hits-to-misses utility to generate misses file.
 
-    if len(argv) != 5: 
+    if len(argv) != 5:
         sys.stderr.write("Usage: MakePlot.py <Misses File> <File of RamInfo> < File of SSDInfo> <File of HDDInfo>\n")
         sys.exit()
     
@@ -22,24 +22,24 @@ def footprint_finder(fname): #returns footprint and creates misses list that wil
             i = i + 1
             misses.append(float(line.split()[1]))
             
-    return i          
+    return i
 
 def read_file(f1, f2, f3):	# format of the input files: two lines. first latency in ns, second cost per page in dollars
     with open(f1) as f:
-        global ram_accesstime 
+        global ram_accesstime
         ram_accesstime = float(f.readline())
-        global ram_costcap 
+        global ram_costcap
         ram_costcap = float(f.readline())
     with open(f2) as f:
-        global ssd_accesstime 
+        global ssd_accesstime
         ssd_accesstime = float(f.readline())
-        global ssd_costcap 
+        global ssd_costcap
         ssd_costcap = float(f.readline())
     with open(f3) as f:
-        global hdd_accesstime 
+        global hdd_accesstime
         hdd_accesstime = float(f.readline())
-        global hdd_costcap 
-        hdd_costcap = float(f.readline())    
+        global hdd_costcap
+        hdd_costcap = float(f.readline())
         
 def make_plot(footprint):
     
@@ -50,31 +50,39 @@ def make_plot(footprint):
         
         while x <footprint:
             name = "RAM:" + str(x)
-            performance_dollar_name = "PPD-" + name
-            filelist.append('"' + name + '"')
-            filelist.append('"' + performance_dollar_name + '"')
+            performance_and_dollar_name = "PAD-" + name
+            performance_per_dollar_name = "PPD-" + name
+           # filelist.append('"' + name + '"')
+            filelist.append('"' + performance_per_dollar_name + '"')
+           # filelist.append('"' + performance_and_dollar_name + '"')
             NoSSDdelay = hdd_accesstime*misses[int(x)]
             NoSSDcost = ram_costcap*x + hdd_costcap*footprint
-            NoSSDstring =  str(NoSSDcost) + " " + str(NoSSDdelay) + '\n' 
+            NoSSDstring = str(NoSSDcost) + " " + str(NoSSDdelay) + '\n'
             file1.write(NoSSDstring)
 
             NoHDDdelay = ssd_accesstime*misses[int(x)]
             NoHDDcost = ram_costcap*x + ssd_costcap*footprint
-            NoHDDstring =  str(NoHDDcost) + " " + str(NoHDDdelay) + '\n' 
+            NoHDDstring = str(NoHDDcost) + " " + str(NoHDDdelay) + '\n'
             file2.write(NoHDDstring)
 
             
 
-            with open(name, 'w') as f, open (performance_dollar_name, 'w') as f1:
+            with open(name, 'w') as f,open (performance_and_dollar_name, 'w') as f1, open (performance_per_dollar_name, 'w') as f2:
                 y = x
+                
                 while y < footprint:
                     delay = ssd_accesstime*misses[int(x )] + hdd_accesstime*misses[int(y)]
                     cost = ram_costcap*x + ssd_costcap*y + hdd_costcap*footprint
-                    filestring = str(cost) + " " + str(delay) + '\n' 
-                    ppdstring = str(cost*delay) + " " + str(y) + '\n'
-                    f.write(filestring) 
-                    f1.write(ppdstring)
-                    y = y +int(footprint/500) 
+                    filestring = str(cost) + " " + str(delay) + '\n'
+                    padstring = str(cost) + " " + str(1/delay) + '\n'
+                   
+                 
+                    ppdstring = str(cost) + " " + str(1/(delay*cost))+ '\n'
+                   
+                    f.write(filestring)
+                    f1.write(padstring)
+                    f2.write(ppdstring)
+                    y = y +int(footprint/500)
 
 
             x = x +int(footprint/ 20)
@@ -83,19 +91,21 @@ def make_plot(footprint):
 
     
 def gnuplot_scripter(filelist, misses_path):
-    print('#! /usr/bin/env gnuplot\n')
+
+    print('#!/usr/bin/env gnuplot\n')
     print('set style data linespoints\n')
-   # print('set style data dots\n')
+    # print('set style data dots\n')
     print('set logscale y\n')
-   # print('set nokey')
-    print('set terminal postscript enhanced color')
-    print ("set output '| ps2pdf - " + misses_path + ".pdf'")
+    # print('set nokey')
+    print('set terminal postscript enhanced color\n')
+    print ("set output '| ps2pdf - " + misses_path + ".pdf'\n")
     
     RAMlist = ",".join(filelist)
-    print ('plot ' + RAMlist +'\n')
+    print ('plot ' + RAMlist)
    # print ("pause -1\n")
+
 
    
 
 if __name__ == "__main__":
-	main(sys.argv)
+    main(sys.argv)
