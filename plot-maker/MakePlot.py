@@ -43,13 +43,13 @@ def read_file(f1, f2, f3): #README file has details on format of input file
         
 def make_plots(footprint): #produces data for three kinds of plots: cost-delay, cost-performance and cost-performance per delay
     #for the filelists below, case 1: no SSD, case 2: no HDD. Remaining cases vary SSD and RAM with HDD = footprint.
-    costdelay_filelist = ['"costdelayRAM:NoSSD, costdelayRAM:NoHDD"'] 
-    costperformance_filelist = ['"costperfRAM:NoSSD, costperfRAM:NoHDD"']
-    costppd_filelist = ['"costPPDRAM:NoSSD, costPPDRAM:NoHDD"'] # ppd = performace per dollar 
+    costdelay_filelist = ['"costdelayRAM:NoSSD", "costdelayRAM:NoHDD"'] 
+    costperformance_filelist = ['"costperfRAM:NoSSD", "costperfRAM:NoHDD"']
+    costppd_filelist = ['"costppdRAM:NoSSD", "costppdRAM:NoHDD"'] # ppd = performace per dollar 
     x = 10000 #10000 pages was chosen as the realistic minimum for how small RAM could be. This can be changed as per discretion. 
     filelist = [costdelay_filelist, costperformance_filelist, costppd_filelist] 
     
-    with open ("costdelayRAM:NoSSD", 'w') as cdNoSSD, open ("costdelayRAM:NoHDD", 'w') as cdNoHDD, open ("costperfRAM:NoSSD", 'w') as cpNoSSD, open ("costperfRAM:NoHDD", 'w') as cpNoHDD, open ("costppdAM:NoSSD", 'w') as cppdNoSSD, open ("costppdRAM:NoHDD", 'w') as cppdNoHDD:
+    with open ("costdelayRAM:NoSSD", 'w') as cdNoSSD, open ("costdelayRAM:NoHDD", 'w') as cdNoHDD, open ("costperfRAM:NoSSD", 'w') as cpNoSSD, open ("costperfRAM:NoHDD", 'w') as cpNoHDD, open ("costppdRAM:NoSSD", 'w') as cppdNoSSD, open ("costppdRAM:NoHDD", 'w') as cppdNoHDD:
         
         while x <footprint:
             cdname = "costdelayRAM:" + str(x)
