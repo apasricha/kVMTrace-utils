@@ -14,7 +14,6 @@ typedef struct _linked_list {
 
   uint64_t value;
   struct _linked_list *next;
-  struct _linked_list *prev;
 
 }linked_list;
 
@@ -70,12 +69,8 @@ hash_table *make_hash_table(int size)
 
 int hash (hash_table *htable, uint64_t key)
 {
-  int hashval;
-
   key >>= 3;
-  hashval = (key ^ (key>>10) ^ (key>>20)) & 0x3FF;\
-  //printf("This is hashval: %d\n", hashval);
-  return hashval;
+  return (key ^ (key>>10) ^ (key>>20)) & 0x3FF;
 }
 
 linked_list *lookup_addr(hash_table *htable, uint64_t addr)
@@ -102,19 +97,11 @@ int remove_from_table(hash_table *htable, uint64_t addr)
     printf("Warning: addr %" PRIx64 " not found, could not delete.\n", addr);
   }
 
-  if(temp->prev == NULL && temp->next == NULL) {
-    free(temp);//Not sure what to do here
-  } else if (temp->next == NULL) {
-    temp->prev->next = NULL;
-    free(temp);
-  } else {
-    temp->value = temp->next->value;
-    temp->next = temp_next->next;
-    free(temp_next);
-
-    temp->prev->next = temp->next;
-    free(temp_next);
-  }
+  //Bad practice, but this is a closed system so no possibility of external pointers
+  temp_next = temp->next;
+  temp->value = temp->next->value;
+  temp->next = temp_next->next;
+  free(temp_next);
 
   return 0;
 
@@ -138,9 +125,6 @@ int insert_to_table(hash_table *htable, uint64_t addr)
   if (current_list != NULL) return 2;
 
   new_list->value = addr;
-  if (htable->table[hashval] != NULL) {
-    htable->table[hashval]->prev = new_list->next;
-  }
   new_list->next = htable->table[hashval];
   htable->table[hashval] = new_list;
 
@@ -206,10 +190,15 @@ uint64_t remove_from_queue (queue *q)
 {
   uint64_t rem;
 
+  if (q->count < q->size) {
+    printf("Warning: Queue is not full.\n");
+		return NULL;
+  } else {
     rem = q->storage[q->first];
     q->first = (q->first+1)%q->size;
     q->count--;
-  
+  }
+
   remove_from_table(q->htable,rem); 
 
   return rem;
