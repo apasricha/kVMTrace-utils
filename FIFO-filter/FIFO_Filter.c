@@ -42,7 +42,6 @@ hash_table *make_hash_table(int size)
   hash_table *new_table;
   int i;
 
-
   if (size < 1) return NULL; //invalid size
 
   //Attempt to allocate memory for table struc
@@ -50,8 +49,6 @@ hash_table *make_hash_table(int size)
     printf("Warning: htable mem allocation failed.\n");
     return NULL;
   }
-
-
 
   //Attempt to allocated memory for actual table
   if((new_table->table = malloc(sizeof(linked_list *)*size)) == NULL) {
@@ -103,7 +100,7 @@ int remove_from_table(hash_table *htable, uint64_t addr)
   }
 
   if(temp->prev == NULL && temp->next == NULL) {
-    free(temp);//Not sure what to do here
+    temp->value = -1;//Not sure what to do here
   } else if (temp->next == NULL) {
     temp->prev->next = NULL;
     free(temp);
