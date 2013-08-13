@@ -72,7 +72,7 @@ int hash (hash_table *htable, uint64_t key)
   key >>= 3;
   hashval = (key ^ (key>>10) ^ (key>>20)) & 0x3FF;\
   //printf("This is hashval: %d\n", hashval);
-  return hashval;
+  return hashval % htable->size;
 }
 
 linked_list *lookup_addr(hash_table *htable, uint64_t addr)
@@ -92,25 +92,20 @@ linked_list *lookup_addr(hash_table *htable, uint64_t addr)
 
 int remove_from_table(hash_table *htable, uint64_t addr)
 {
-  linked_list *temp;
-  linked_list *temp_next;
+  linked_list* temp;
+  linked_list* to_remove;
 
   if((temp = lookup_addr(htable,addr)) == NULL) {
     printf("Warning: addr %" PRIx64 " not found, could not delete.\n", addr);
   }
 
-  if(temp->prev == NULL && temp->next == NULL) {
-    temp->value = -1;//Not sure what to do here
-  } else if (temp->next == NULL) {
-    temp->prev->next = NULL;
-    free(temp);
+  if(temp->prev == NULL) {
+    temp->value = 0;
   } else {
-    temp->value = temp->next->value;
-    temp->next = temp_next->next;
-    free(temp_next);
-
-    temp->prev->next = temp->next;
-    free(temp_next);
+    temp->prev->next = NULL;
+    temp->prev = NULL;
+    temp->next = NULL;
+    free(temp);
   }
 
   return 0;
@@ -135,10 +130,11 @@ int insert_to_table(hash_table *htable, uint64_t addr)
   if (current_list != NULL) return 2;
 
   new_list->value = addr;
-  if (htable->table[hashval] != NULL) {
-    htable->table[hashval]->prev = new_list->next;
+  if (htable->table[hashval] != NULL &&  htable->table[hashval]->value != 0) {
+    htable->table[hashval]->prev = new_list;//problem?
+    new_list->next = htable->table[hashval];
   }
-  new_list->next = htable->table[hashval];
+  //new_list->next = htable->table[hashval];//Don't know if in ^ or here
   htable->table[hashval] = new_list;
 
   return 0;
@@ -216,7 +212,8 @@ uint64_t remove_from_queue (queue *q)
 int insert_to_queue (queue *q, uint64_t addr)
 {
   if(q->count >= q->size) {
-    printf("Warning: queue is full, %" PRIx64 " removed.\n",remove_from_queue(q));
+    remove_from_queue(q);
+    // printf("Warning: queue is full, %" PRIx64 " removed.\n",remove_from_queue(q));
   }
 
   q->last = (q->last+1) % q->size;
@@ -246,6 +243,8 @@ int main(int argc, char *argv[])
   queue *FIFO_queue;
   linked_list *list;
 
+  int line_count = 1;
+
   if((lookup_table = make_hash_table(FIFO_size)) == NULL) {
     printf("Warning: failed to make hash table.\n");
     return 1; 
@@ -257,14 +256,11 @@ int main(int argc, char *argv[])
   }
 
   while((scanf("%"PRIx64"",&address)) == 1) {
-    if ((list = lookup_addr(lookup_table, address)) != NULL) {
-      //printf("Address already in queue.\n");
-    } else {
+    if ((list = lookup_addr(lookup_table, address)) == NULL) {
       insert_to_queue(FIFO_queue, address);
-			printf("%" PRIx64 "\n", address);
+      printf("%" PRIx64 "\n", address);
       //printf("Address %" PRIx64 " was added to queue.\n", address);
     }
-
   }
 
 	free_table(lookup_table);
