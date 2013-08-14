@@ -154,7 +154,6 @@ void free_table(hash_table *htable)
     while(list!=NULL) {
       temp = list;
       list = list->next;
-      free(temp->value);
       free(temp);
     }
   }
@@ -189,7 +188,8 @@ queue *make_queue(int size, hash_table *htable)
   }
 
   //Initialize elements
-  for (i = 0; i < size; i++) new_queue->storage[i] = NULL;
+  for (i = 0; i < size; i++)
+    new_queue->storage[i] = 0;
 
   return new_queue;
 
